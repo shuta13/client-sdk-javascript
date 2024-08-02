@@ -13,6 +13,8 @@ export class TokenVendingMachineStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
+    const appEnvValue = process.env.APP_ENV ?? 'dev';
+
     const momentoApiKeyParam = new cdk.CfnParameter(this, 'MomentoApiKey', {
       type: 'String',
       description:
@@ -21,12 +23,12 @@ export class TokenVendingMachineStack extends cdk.Stack {
     });
 
     const apiKeySecret = new secrets.Secret(this, 'MomentoTokenVendingMachineApiKey', {
-      secretName: 'MomentoTokenVendingMachineApiKey',
+      secretName: `MomentoTokenVendingMachineApiKey-${appEnvValue}`,
       secretStringValue: new cdk.SecretValue(momentoApiKeyParam.valueAsString),
     });
 
     const tvmLambda = new lambdaNodejs.NodejsFunction(this, 'MomentoTokenVendingMachine', {
-      functionName: 'MomentoTokenVendingMachine',
+      functionName: `MomentoTokenVendingMachine-${appEnvValue}`,
       runtime: lambda.Runtime.NODEJS_18_X,
       entry: path.join(__dirname, '../../lambda/token-vending-machine/handler.ts'),
       projectRoot: path.join(__dirname, '../../lambda/token-vending-machine'),
@@ -42,7 +44,7 @@ export class TokenVendingMachineStack extends cdk.Stack {
     apiKeySecret.grantRead(tvmLambda);
 
     const api = new apig.RestApi(this, 'MomentoTokenVendingMachineApi', {
-      restApiName: 'Momento Token Vending Machine',
+      restApiName: `Momento Token Vending Machine - ${appEnvValue}`,
     });
 
     const tvmIntegration = new apig.LambdaIntegration(tvmLambda, {
@@ -52,7 +54,7 @@ export class TokenVendingMachineStack extends cdk.Stack {
     switch (config.authenticationMethod) {
       case config.AuthenticationMethod.LambdaAuthorizer: {
         const authLambda = new lambdaNodejs.NodejsFunction(this, 'MomentoTokenVendingMachineAuthorizer', {
-          functionName: 'MomentoTokenVendingMachineAuthorizer',
+          functionName: `MomentoTokenVendingMachineAuthorizer-${appEnvValue}`,
           runtime: lambda.Runtime.NODEJS_18_X,
           entry: path.join(__dirname, '../../lambda/authorizer/authorizer.ts'),
           projectRoot: path.join(__dirname, '../../lambda/authorizer'),
@@ -81,7 +83,7 @@ export class TokenVendingMachineStack extends cdk.Stack {
       }
       case config.AuthenticationMethod.AmazonCognito: {
         const userPool = new cognito.UserPool(this, 'MomentoTokenVendingMachineUserPool', {
-          userPoolName: 'MomentoTokenVendingMachineUserPool',
+          userPoolName: `MomentoTokenVendingMachineUserPool-${appEnvValue}`,
           signInAliases: {
             username: true,
           },
@@ -107,13 +109,13 @@ export class TokenVendingMachineStack extends cdk.Stack {
 
         const userPoolReadOnlyGroup = new cognito.CfnUserPoolGroup(this, 'ReadOnlyUserGroup', {
           userPoolId: userPool.userPoolId,
-          groupName: 'ReadOnlyUserGroup',
+          groupName: `ReadOnlyUserGroup-${appEnvValue}`,
           description: 'Group for users who can only subscribe to Momento Topics, not publish',
         });
 
         const userPoolReadWriteGroup = new cognito.CfnUserPoolGroup(this, 'ReadWriteUserGroup', {
           userPoolId: userPool.userPoolId,
-          groupName: 'ReadWriteUserGroup',
+          groupName: `ReadWriteUserGroup-${appEnvValue}`,
           description: 'Group for users who can only subscribe and publish messages to Momento Topics',
         });
 

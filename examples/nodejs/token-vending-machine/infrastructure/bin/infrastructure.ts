@@ -3,7 +3,8 @@ import * as cdk from 'aws-cdk-lib';
 import {TokenVendingMachineStack} from '../lib/token-vending-machine-stack';
 
 const app = new cdk.App();
-new TokenVendingMachineStack(app, 'MomentoTokenVendingMachine', {
+const appEnvValue = process.env.APP_ENV ?? 'dev';
+new TokenVendingMachineStack(app, `MomentoTokenVendingMachine-${appEnvValue}`, {
   /* If you don't specify 'env', this stack will be environment-agnostic.
    * Account/Region-dependent features and context lookups will not work,
    * but a single synthesized template can be deployed anywhere. */

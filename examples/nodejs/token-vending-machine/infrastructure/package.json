@@ -10,7 +10,8 @@
     "watch": "tsc -w",
     "test": "jest",
     "cdk": "cdk",
-    "deploy": "cd ../lambda/token-vending-machine && npm install && cd - && cdk deploy",
+    "deploy:dev": "cd ../lambda/token-vending-machine && npm install && cd - && APP_ENV=dev cdk deploy",
+    "deploy:prod": "cd ../lambda/token-vending-machine && npm install && cd - && APP_ENV=prod cdk deploy",
     "lint": "eslint . --ext .ts",
     "format": "eslint . --ext .ts --fix"
   },
