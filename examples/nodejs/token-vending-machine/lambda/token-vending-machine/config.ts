@@ -1,4 +1,4 @@
-import {ExpiresIn, AllTopics, CacheRole, TopicRole, DisposableTokenScope} from '@gomomento/sdk';
+import {ExpiresIn, AllTopics, CacheRole, TopicRole, DisposableTokenScope, AllDataReadWrite} from '@gomomento/sdk';
 
 /**
  * First, set the scope of permissions for your tokens.
@@ -39,7 +39,7 @@ import {ExpiresIn, AllTopics, CacheRole, TopicRole, DisposableTokenScope} from '
  * to specify cache and topic permissions.
  * More information here: https://docs.momentohq.com/develop/api-reference/auth-tokens#disposabletokenscope-objects
  */
-export const tokenPermissions: DisposableTokenScope = {
+export const tokenPermissions: DisposableTokenScope = AllDataReadWrite; /* {
   permissions: [
     {
       role: CacheRole.ReadWrite,
@@ -51,7 +51,7 @@ export const tokenPermissions: DisposableTokenScope = {
       topic: AllTopics,
     },
   ],
-};
+}; */
 
 /**
  * Second, set the TTL for your tokens in terms of seconds, minutes, hours,
